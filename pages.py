@@ -9,7 +9,6 @@ from table_page import TablePage
 class MultiPageApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.title("Калькулятор v0.9")
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
 
