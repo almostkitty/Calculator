@@ -2,67 +2,55 @@ import tkinter as tk
 from tkinter import ttk
 from sympy import sympify
 
-
 class IntegrationPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
 
-        label_title = ttk.Label(self, text="ИНТЕГРИРОВАНИЕ", font=("Helvetica", 20, "bold"))
-        label_title.grid(row=0, column=0, columnspan=1, pady=10, padx=10, sticky="ns")
+        label1 = ttk.Label(self, text="ИНТЕГРИРОВАНИЕ", font=("Helvetica", 20, "bold"))
+        label1.pack(pady=20, padx=20)
 
-        labels = [
-            "Подынтегральная функция:",
-            "Нижний предел(a):",
-            "Верхний предел(b):",
-            "Точность:",
-            "Кол-во разбиений:",
-            "Метод:"
-        ]
-
-        self.label_function = ttk.Label(self, text=labels[0])
+        self.label_function = ttk.Label(self, text="Подынтегральная функция:")
         self.entry_function = ttk.Entry(self)
+        self.label_function.pack()
+        self.entry_function.pack()
 
-        self.label_a = ttk.Label(self, text=labels[1])
+        self.label_a = ttk.Label(self, text="Нижний предел(a):")
         self.entry_a = ttk.Entry(self)
+        self.label_a.pack()
+        self.entry_a.pack()
 
-        self.label_b = ttk.Label(self, text=labels[2])
+        self.label_b = ttk.Label(self, text="Верхний предел(b):")
         self.entry_b = ttk.Entry(self)
+        self.label_b.pack()
+        self.entry_b.pack()
 
-        self.label_partitions = ttk.Label(self, text=labels[3])
+        self.label_tochno = ttk.Label(self, text="Точность:")
         self.entry_tochno = ttk.Entry(self)
+        self.label_tochno.pack()
+        self.entry_tochno.pack()
 
-        self.label_partitions = ttk.Label(self, text=labels[4])
+        ttk.Label(self, text="Кол-во разбиений:").pack()
         self.entry_partitions = ttk.Entry(self)
+        self.entry_partitions.pack()
 
-
-        self.label_method = ttk.Label(self, text=labels[5])
+        ttk.Label(self, text="Метод:").pack()
         self.method_var = tk.StringVar()
         self.method_combobox = ttk.Combobox(self, textvariable=self.method_var,
-                                            values=["Прямоугольники левых частей",
-                                                    "Прямоугольники левых частей I",
-                                                    "Прямоугольники левых частей II",
-                                                    "Прямоугольники правых частей",
-                                                    "Трапеции",
-                                                    "Параболы"])
+                                           values=["Прямоугольники левых частей",
+                                                   "Прямоугольники левых частей I",
+                                                   "Прямоугольники левых частей II",
+                                                   "Прямоугольники правых частей",
+                                                   "Трапеции",
+                                                   "Параболы"])
+        self.method_combobox.pack()
 
+        self.result_text = tk.Text(self, height=2, width=50)
+        self.result_text.pack()
 
-        self.calculate_button = ttk.Button(self, text="Вычислить", command=self.calculate_integral)
+        ttk.Button(self, text="Вычислить", command=self.calculate_integral).pack()
+        ttk.Button(self, text="Назад↩️", command=lambda: self.controller.show_page("MainPage")).pack()
 
-        self.button_main_page = ttk.Button(self, text="Сравнить результаты", command=lambda: self.controller.show_page("TablePage"))
-        self.button_main_page.grid(row=8, column=0, columnspan=3, pady=10)
-
-        self.button_main_page = ttk.Button(self, text="Назад", command=lambda: self.controller.show_page("MainPage"))
-        self.button_main_page.grid(row=10, column=0, columnspan=3, pady=10)
-
-        for i, label_text in enumerate(labels, start=1):
-            tk.Label(self, text=label_text).grid(row=i, column=0, sticky="w", padx=10, pady=5)
-
-        entry_widgets = [self.entry_function, self.entry_a, self.entry_b, self.entry_tochno, self.entry_partitions, self.method_combobox]
-        for i, entry_widget in enumerate(entry_widgets, start=1):
-            entry_widget.grid(row=i, column=1, padx=10, pady=5)
-
-        self.calculate_button.grid(row=7, column=0, columnspan=3, pady=10)
 
 
     def calculate_integral(self):
@@ -87,8 +75,9 @@ class IntegrationPage(tk.Frame):
         elif method == "Параболы":
             result = self.calculate_parabolas(function_str, a, b, partitions)
 
-        result_label = ttk.Label(self, text=f"Результат интегрирования: {result}")
-        result_label.grid(row=9, column=0, columnspan=3, pady=10)
+        self.result_text.delete(1.0, tk.END)  # Очистка предыдущего результата
+        self.result_text.insert(tk.END, f"Результат интегрирования: {result}")
+
 
 
     def calculate_left_rectangles(self, function_str, a, b, partitions):
