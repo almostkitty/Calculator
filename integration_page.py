@@ -54,30 +54,36 @@ class IntegrationPage(tk.Frame):
 
 
     def calculate_integral(self):
-        function_str = self.entry_function.get()
-        a = float(self.entry_a.get())  # ВЕРХНИЙ ПРЕДЕЛ
-        b = float(self.entry_b.get())  # НИЖНИЙ ПРЕДЕЛ
-        tochno = float(self.entry_tochno.get())
-        partitions = int(self.entry_partitions.get())  # РАЗБИЕНИЯ
+        try:
+            function_str = self.entry_function.get()
+            a = float(self.entry_a.get())  # ВЕРХНИЙ ПРЕДЕЛ
+            b = float(self.entry_b.get())  # НИЖНИЙ ПРЕДЕЛ
+            tochno = float(self.entry_tochno.get())
+            partitions = int(self.entry_partitions.get())  # РАЗБИЕНИЯ
 
-        method = self.method_var.get()
+            method = self.method_var.get()
 
-        if method == "Прямоугольники левых частей":
-            result = self.calculate_left_rectangles(function_str, a, b, partitions)
-        elif method == "Прямоугольники левых частей I":
-            result = self.calculate_left_first(function_str, a, b, partitions, tochno)
-        elif method == "Прямоугольники левых частей II":
-            result = self.calculate_left_second(function_str, a, b, partitions, tochno)
-        elif method == "Прямоугольники правых частей":
-            result = self.calculate_right_rectangles(function_str, a, b, partitions)
-        elif method == "Трапеции":
-            result = self.calculate_trapezoids(function_str, a, b, partitions)
-        elif method == "Параболы":
-            result = self.calculate_parabolas(function_str, a, b, partitions)
+            if method == "Прямоугольники левых частей":
+                result = self.calculate_left_rectangles(function_str, a, b, partitions)
+            elif method == "Прямоугольники левых частей I":
+                result = self.calculate_left_first(function_str, a, b, partitions, tochno)
+            elif method == "Прямоугольники левых частей II":
+                result = self.calculate_left_second(function_str, a, b, partitions, tochno)
+            elif method == "Прямоугольники правых частей":
+                result = self.calculate_right_rectangles(function_str, a, b, partitions)
+            elif method == "Трапеции":
+                result = self.calculate_trapezoids(function_str, a, b, partitions)
+            elif method == "Параболы":
+                result = self.calculate_parabolas(function_str, a, b, partitions)
 
-        self.result_text.delete(1.0, tk.END)  # Очистка предыдущего результата
-        self.result_text.insert(tk.END, f"Результат интегрирования: {result}")
+            self.result_text.delete(1.0, tk.END)  # Очистка предыдущего результата
+            self.result_text.insert(tk.END, f"Результат интегрирования: {result}")
 
+        except ValueError as e:
+            # Обработка ошибки ввода данных
+            self.result_text.delete(1.0, tk.END)
+            error_message = f"Ошибка ввода данных: {str(e)}"
+            self.result_text.insert(tk.END, error_message)
 
 
     def calculate_left_rectangles(self, function_str, a, b, partitions):
