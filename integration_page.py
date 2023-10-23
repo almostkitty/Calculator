@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from sympy import sympify
 
+
 class IntegrationPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -51,8 +52,6 @@ class IntegrationPage(tk.Frame):
         ttk.Button(self, text="Вычислить", command=self.calculate_integral).pack()
         ttk.Button(self, text="Назад↩️", command=lambda: self.controller.show_page("MainPage")).pack()
 
-
-
     def calculate_integral(self):
         try:
             function_str = self.entry_function.get()
@@ -76,16 +75,14 @@ class IntegrationPage(tk.Frame):
             elif method == "Параболы":
                 result = self.calculate_parabolas(function_str, a, b, partitions)
 
-            self.result_text.delete(1.0, tk.END)  # Очистка предыдущего результата
+            self.result_text.delete(1.0, tk.END)
             self.result_text.insert(tk.END, f"Результат интегрирования: {result}")
 
         except ValueError as e:
-            # Обработка ошибки ввода данных
             self.result_text.delete(1.0, tk.END)
             error_message = f"Ошибка ввода данных: {str(e)}"
             self.result_text.insert(tk.END, error_message)
-
-
+            
     def calculate_left_rectangles(self, function_str, a, b, partitions):
         result = 0.0
         step = (b - a) / partitions
@@ -123,7 +120,7 @@ class IntegrationPage(tk.Frame):
             result = I2N
 
             if R <= tochno:
-                break  # добавлено условие выхода из цикла
+                break
 
         return result
 
@@ -160,9 +157,8 @@ class IntegrationPage(tk.Frame):
             R = abs(I2N - IN)
             IN = I2N
             step /= 2
-            result = I2N  # Исправлено: I2N присваивается в переменную result
+            result = I2N
 
-        # print('это медленный метод', result)
         return result
 
 
@@ -207,6 +203,3 @@ class IntegrationPage(tk.Frame):
 
     def show_page(self):
         self.controller.show_page("MainPage")
-
-
-
