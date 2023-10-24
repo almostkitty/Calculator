@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from sympy import sympify
+import time
 
 
 class IntegrationPage(tk.Frame):
@@ -46,7 +47,7 @@ class IntegrationPage(tk.Frame):
                                                    "Параболы"])
         self.method_combobox.pack()
 
-        self.result_text = tk.Text(self, height=2, width=50)
+        self.result_text = tk.Text(self, height=3, width=50)
         self.result_text.pack()
 
         ttk.Button(self, text="Вычислить", command=self.calculate_integral).pack()
@@ -62,6 +63,8 @@ class IntegrationPage(tk.Frame):
 
             method = self.method_var.get()
 
+            start_time = time.time()
+
             if method == "Прямоугольники левых частей":
                 result = self.calculate_left_rectangles(function_str, a, b, partitions)
             elif method == "Прямоугольники левых частей I":
@@ -75,14 +78,18 @@ class IntegrationPage(tk.Frame):
             elif method == "Параболы":
                 result = self.calculate_parabolas(function_str, a, b, partitions)
 
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+
             self.result_text.delete(1.0, tk.END)
-            self.result_text.insert(tk.END, f"Результат интегрирования: {result}")
+            self.result_text.insert(tk.END, f"Результат интегрирования: {result}\n"
+                                             f"Время выполнения: {elapsed_time:.4f} секунд")
 
         except ValueError as e:
             self.result_text.delete(1.0, tk.END)
             error_message = f"Ошибка ввода данных: {str(e)}"
             self.result_text.insert(tk.END, error_message)
-            
+
     def calculate_left_rectangles(self, function_str, a, b, partitions):
         result = 0.0
         step = (b - a) / partitions
@@ -203,3 +210,4 @@ class IntegrationPage(tk.Frame):
 
     def show_page(self):
         self.controller.show_page("MainPage")
+
