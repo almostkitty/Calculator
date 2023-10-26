@@ -16,11 +16,14 @@ class MainPage(tk.Frame):
         button1 = ttk.Button(self, text="Интегрирование✅", command=lambda: controller.show_page("IntegrationPage"))
         button1.pack(fill="x")
 
-        button2 = ttk.Button(self, text="Дифференциальные Уравнения❌", state=["disabled"])
+        button2 = ttk.Button(self, text="Кратный интеграл✅", command=lambda: controller.show_page("KratniPage"))
         button2.pack(fill="x")
 
-        button3 = ttk.Button(self, text="Разработчики🧑🏿‍💻", command=lambda: controller.show_page("DevPage"))
+        button3 = ttk.Button(self, text="Дифференциальные Уравнения❌", state=["disabled"])
         button3.pack(fill="x")
 
-        button4 = ttk.Button(self, text="Настройки⚙️", command=lambda: controller.show_page("SetPage"))
+        button4 = ttk.Button(self, text="Разработчики🧑🏿‍💻", command=lambda: controller.show_page("DevPage"))
         button4.pack(fill="x")
+
+        button5 = ttk.Button(self, text="Настройки⚙️", command=lambda: controller.show_page("SetPage"))
+        button5.pack(fill="x")

@@ -3,6 +3,7 @@ from main_page import MainPage
 from integration_page import IntegrationPage
 from dev_page import DevPage
 from settings_page import SetPage
+from kratni_page import KratniPage
 
 
 class MultiPageApp(tk.Tk):
@@ -13,7 +14,7 @@ class MultiPageApp(tk.Tk):
 
         self.pages = {}
 
-        for PageClass in (MainPage, IntegrationPage, DevPage, SetPage):
+        for PageClass in (MainPage, IntegrationPage, DevPage, SetPage, KratniPage):
             page_name = PageClass.__name__
             page = PageClass(parent=container, controller=self)
             self.pages[page_name] = page
