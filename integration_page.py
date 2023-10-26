@@ -4,7 +4,6 @@ from sympy import sympify
 import time
 
 
-
 class IntegrationPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -78,6 +77,8 @@ class IntegrationPage(tk.Frame):
                 result = self.calculate_trapezoids(function_str, a, b, partitions)
             elif method == "Параболы":
                 result = self.calculate_parabolas(function_str, a, b, partitions)
+            elif method == "Кратный интеграл":
+                result = self.calculate_kratni(function_str, a, b, partitions)
 
             end_time = time.time()
             elapsed_time = end_time - start_time
@@ -104,14 +105,13 @@ class IntegrationPage(tk.Frame):
         return result
 
     def calculate_left_first(self, function_str, a, b, partitions, tochno):
+        result = 0.0
         step = (b - a) / partitions
         IN = 0.0
         I2N = 0.0
         R = 0.0
         x = a
-
         func = sympify(function_str)
-        result = 0.0
 
         while True:
             result = 0.0
@@ -132,62 +132,40 @@ class IntegrationPage(tk.Frame):
 
         return result
 
-    # def calculate_left_second(self, function_str, a, b, partitions, tochno):
-    #     step = (b - a) / partitions
-    #     IN = 0
-    #     S2 = 0
-    #     x = a
-    #     result = 0.0
-    #
-    #     func = sympify(function_str)
-    #
-    #     while x <= b - step:
-    #         S2 += abs(func.subs('x', x))
-    #         x += step
-    #
-    #     I2N = step * S2
-    #     R = abs(I2N - IN)
-    #     IN = I2N
-    #     step /= 2
-    #
-    #     while R > tochno:
-    #         I2N = 0
-    #         x = a + step / 2
-    #
-    #         while x <= b - step:
-    #             I2N += abs(func.subs('x', x))
-    #             x += step
-    #
-    #         I2N = (step / 2) * (S2 + I2N)
-    #         R = abs(I2N - IN)
-    #         IN = I2N
-    #         step /= 2
-    #         result = I2N
-    #
-    #     return result
-
     def calculate_left_second(self, function_str, a, b, partitions, tochno):
-        result = 0.0
+        step = (b - a) / partitions
+        IN = 0
+        S2 = 0
         x = a
+        result = 0.0
+
         func = sympify(function_str)
-        step_v = (b - a) / partitions  # шаг движения H(v)
 
-        while x <= b:
-            S2 = 0
-            step_d = step_v / 2  # начальный шаг вычислений H(d)
+        while x <= b - step:
+            S2 += abs(func.subs('x', x))
+            x += step
 
-            while x <= b - step_d:
-                S2 += abs(func.subs('x', x))
-                x += step_d
+        I2N = step * S2
+        R = abs(I2N - IN)
+        IN = I2N
+        step /= 2
 
-            result += step_d * S2
-            step_d /= 2
+        while R > tochno:
+            I2N = 0
+            x = a + step / 2
 
-            # проверка на точность
-            if abs(step_d) < tochno or x > b:
-                break
+            while x <= b - step:
+                I2N += abs(func.subs('x', x))
+                x += step
+
+            I2N = (step / 2) * (S2 + 2 * I2N)
+            R = abs(I2N - IN)
+            IN = I2N
+            step /= 2
+            result = I2N
 
         return result
+
 
     def calculate_right_rectangles(self, function_str, a, b, partitions):
         result = 0.0
@@ -228,5 +206,7 @@ class IntegrationPage(tk.Frame):
         result *= step
         return result
 
+
     def show_page(self):
         self.controller.show_page("MainPage")
+
