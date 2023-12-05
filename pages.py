@@ -4,6 +4,10 @@ from integration_page import IntegrationPage
 from dev_page import DevPage
 from settings_page import SetPage
 from kratni_page import KratniPage
+from dyselect_page import DySelectPage
+from dy_first_page import DyFirstPage
+from dy_second_page import DySecondPage
+from dy_third_page import DyThirdPage
 
 
 class MultiPageApp(tk.Tk):
@@ -14,7 +18,7 @@ class MultiPageApp(tk.Tk):
 
         self.pages = {}
 
-        for PageClass in (MainPage, IntegrationPage, DevPage, SetPage, KratniPage):
+        for PageClass in (MainPage, IntegrationPage, DevPage, SetPage, KratniPage, DySelectPage, DyFirstPage, DySecondPage, DyThirdPage):
             page_name = PageClass.__name__
             page = PageClass(parent=container, controller=self)
             self.pages[page_name] = page

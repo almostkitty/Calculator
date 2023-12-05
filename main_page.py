@@ -19,7 +19,7 @@ class MainPage(tk.Frame):
         button2 = ttk.Button(self, text="Кратный интеграл✅", command=lambda: controller.show_page("KratniPage"))
         button2.pack(fill="x")
 
-        button3 = ttk.Button(self, text="Дифференциальные Уравнения❌", state=["disabled"])
+        button3 = ttk.Button(self, text="Дифференциальные Уравнения✅", command=lambda: controller.show_page("DySelectPage"))
         button3.pack(fill="x")
 
         button4 = ttk.Button(self, text="Разработчики🧑🏿‍💻", command=lambda: controller.show_page("DevPage"))
@@ -27,3 +27,9 @@ class MainPage(tk.Frame):
 
         button5 = ttk.Button(self, text="Настройки⚙️", command=lambda: controller.show_page("SetPage"))
         button5.pack(fill="x")
+
+        button6 = ttk.Button(self, text="Выйти️❌", command=self.close_app)
+        button6.pack(fill="x")
+
+    def close_app(self):
+        self.controller.quit()
