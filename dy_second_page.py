@@ -4,7 +4,6 @@ from sympy import sympify, Symbol
 import time
 import matplotlib.pyplot as plt
 
-
 class DySecondPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -66,7 +65,7 @@ class DySecondPage(tk.Frame):
         self.method_var = tk.StringVar()
         self.method_var.set("Эйлера")  # Метод по умолчанию
 
-        methods = ["Эйлера", "Рунге–Кутта"]
+        methods = ["Эйлера"]
 
         for method in methods:
             ttk.Radiobutton(self, text=method, variable=self.method_var, value=method).pack()
@@ -102,14 +101,9 @@ class DySecondPage(tk.Frame):
             d = float(self.entry_d.get())
             h = int(self.entry_h.get())
 
-            method = self.method_var.get()
+            result = self.calculate_double_euler(function_str, a, b, c, d, h)
 
             start_time = time.time()
-
-            if method == "Эйлера":
-                result = self.calculate_euler(function_str, a, b, c, d, h)
-            elif method == "Рунге–Кутта":
-                result = self.calculate_runge_kutta(function_str, a, b, c, d, h)
 
             end_time = time.time()
             elapsed_time = end_time - start_time
@@ -126,20 +120,18 @@ class DySecondPage(tk.Frame):
             self.result_text.insert(tk.END, f"Время выполнения: {elapsed_time:.4f} секунд")
 
             # Use the after() method to schedule the update_plot() function on the main thread
-            self.after(10, lambda: self.update_plot(result, method, h))
+            self.after(10, lambda: self.update_plot(result, h))
 
         except ValueError as e:
             self.result_text.delete(1.0, tk.END)
             error_message = f"Ошибка ввода данных: {str(e)}"
             self.result_text.insert(tk.END, error_message)
 
+
     def perform_calculations(self, function_str, a, b, c, d, h, method):
         start_time = time.time()
 
-        if method == "Эйлера":
-            result = self.calculate_euler(function_str, a, b, c, d, h)
-        elif method == "Рунге–Кутта":
-            result = self.calculate_runge_kutta(function_str, a, b, c, d, h)
+        result = self.calculate_euler(function_str, a, b, c, d, h)
 
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -161,10 +153,7 @@ class DySecondPage(tk.Frame):
         x_values, y_values = zip(*result)
 
         # Plot the graph
-        if method == "Эйлера":
-            plt.plot(x_values, y_values, label=f"Эйлера ({h} разбиений)")
-        elif method == "Рунге–Кутта":
-            plt.plot(x_values, y_values, label=f"Рунге–Кутта ({h} разбиений)")
+        plt.plot(x_values, y_values, label=f"Эйлера ({h} разбиений)")
 
         # Add labels and legend
         plt.title("Интегральные кривые")
@@ -175,51 +164,22 @@ class DySecondPage(tk.Frame):
         # Show the plot
         plt.pause(0.01)  # Pause to allow the plot to update
 
-
-    def calculate_euler(self, function_str, a, b, c, d, h):
+    def calculate_euler(function_str, a, b, c, d, h):
         result = []
 
         x, y = Symbol('x'), Symbol('y')
         expression = sympify(function_str)
 
         while c <= (b - h):
-            dy = h * expression.subs({x: c, y: d})
-            d = d + dy
+            dy1 = h * expression.subs({x: c, y: d})
+            dy2 = h * expression.subs({x: c + h, y: d + dy1})
+
+            d = d + (dy1 + dy2) / 2
             result.append((c + h, d))
             c = c + h
 
         return result
 
-    class RungeKuttaSolver:
-        def calculate_runge_kutta(self, function_str, a, b, c, d, h):
-            result = []
-
-            x, y, z = Symbol('x'), Symbol('y'), Symbol('z')
-            expression = sympify(function_str)
-
-            while c <= (b - h):
-                # Разбиваем уравнение второго порядка на систему уравнений первого порядка
-                dydx = z
-                dzdx = expression.subs({x: c, y: d, z: z})
-
-                # Используем метод Рунге-Кутта для каждого уравнения
-                k1_y = h * dydx
-                k1_z = h * dzdx
-                k2_y = h * (dydx + 0.5 * k1_z)
-                k2_z = h * expression.subs({x: c + h / 2, y: d + 0.5 * k1_y, z: z + 0.5 * k1_z})
-                k3_y = h * (dydx + 0.5 * k2_z)
-                k3_z = h * expression.subs({x: c + h / 2, y: d + 0.5 * k2_y, z: z + 0.5 * k2_z})
-                k4_y = h * (dydx + k3_z)
-                k4_z = h * expression.subs({x: c + h, y: d + k3_y, z: z + k3_z})
-
-                # Обновляем значения y и z
-                d = d + (1 / 6) * (k1_y + 2 * k2_y + 2 * k3_y + k4_y)
-                z = z + (1 / 6) * (k1_z + 2 * k2_z + 2 * k3_z + k4_z)
-
-                result.append((c + h, d))
-                c = c + h
-
-            return result
 
     def show_dy_page(self):
         plt.close()
