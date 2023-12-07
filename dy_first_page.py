@@ -57,7 +57,7 @@ class DyFirstPage(tk.Frame):
         ttk.Label(self, text="Метод:").pack()
 
         self.method_var = tk.StringVar()
-        self.method_var.set("Эйлера")  # Метод по умолчанию
+        self.method_var.set("Эйлера")
 
         methods = ["Эйлера", "Рунге–Кутта"]
 
@@ -106,14 +106,12 @@ class DyFirstPage(tk.Frame):
 
             pair_number = 1
             for x, y in result:
-                formatted_result = f"{pair_number} пара ---- x={x:.3f}, y={y:.3f}\n"
+                formatted_result = f"{pair_number} пара ---- x={x:.5f}, y={y:.5f}\n"
                 self.result_text.insert(tk.END, formatted_result)
                 pair_number += 1
 
-            # Добавим время выполнения
-            self.result_text.insert(tk.END, f"Время выполнения: {elapsed_time:.4f} секунд")
+            self.result_text.insert(tk.END, f"Время выполнения: {elapsed_time:.5f} секунд")
 
-            # Use the after() method to schedule the update_plot() function on the main thread
             self.after(10, lambda: self.update_plot(result, method, partitions))
 
         except ValueError as e:
@@ -132,36 +130,30 @@ class DyFirstPage(tk.Frame):
         end_time = time.time()
         elapsed_time = end_time - start_time
 
-        # Use the main thread to update the text field
         self.result_text.delete(1.0, tk.END)
         for x, y in result:
-            formatted_result = f"x={x:.3f}, y={y:.3f}\n"
+            formatted_result = f"x={x:.5f}, y={y:.5f}\n"
             self.result_text.insert(tk.END, formatted_result)
         self.result_text.insert(tk.END, f"Время выполнения: {elapsed_time:.4f} секунд")
 
-        # Use the main thread to update the plot
         self.update_plot(result, method, partitions)
 
     def update_plot(self, result, method, partitions):
-        plt.clf()  # Clear the current plot
+        plt.clf()
 
-        # Prepare data for plotting
         x_values, y_values = zip(*result)
 
-        # Plot the graph
         if method == "Эйлера":
-            plt.plot(x_values, y_values, label=f"Эйлера ({partitions} разбиений)")
+            plt.plot(x_values, y_values, label=f"Эйлера ({partitions} разбиений)", marker='o')
         elif method == "Рунге–Кутта":
-            plt.plot(x_values, y_values, label=f"Рунге–Кутта ({partitions} разбиений)")
+            plt.plot(x_values, y_values, label=f"Рунге–Кутта ({partitions} разбиений)", marker='o')
 
-        # Add labels and legend
         plt.title("Интегральные кривые")
         plt.xlabel("x")
         plt.ylabel("y")
         plt.legend()
 
-        # Show the plot
-        plt.pause(0.01)  # Pause to allow the plot to update
+        plt.pause(0.01)
 
     def calculate_euler(self, function_str, a, b, c, d, partitions):
         result = []

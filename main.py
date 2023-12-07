@@ -4,7 +4,7 @@ from pages import MultiPageApp
 
 if __name__ == "__main__":
     app = MultiPageApp()
-    app.title("Калькулятор v2.0–beta")
+    app.title("Калькулятор v2.0")
     # app.geometry("420x500")
     app.resizable(False, False)
     app.attributes("-alpha", 0.95)

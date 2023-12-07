@@ -4,6 +4,7 @@ from sympy import sympify, Symbol
 import time
 import matplotlib.pyplot as plt
 
+
 class DySecondPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -12,17 +13,13 @@ class DySecondPage(tk.Frame):
         label_title = ttk.Label(self, text="Решение уравнений II порядка", font=("Helvetica", 20, "bold"))
         label_title.pack(pady=20, padx=20)
 
-        frame_ur = ttk.Frame(self)
-        frame_ur.pack()
+        self.label_equation = ttk.Label(self, text="Уравнение:")
+        self.entry_equation = ttk.Entry(self)
+        self.label_equation.pack()
+        self.entry_equation.pack()
 
-        self.label_function_1 = ttk.Label(frame_ur, text="Ур–ние:")
-        self.entry_function = ttk.Entry(frame_ur)
-        self.label_function_1.pack(side="left")
-        self.entry_function.pack(side="left")
-
-
-        self.label_function = ttk.Label(self, text="Отрезок")
-        self.label_function.pack()
+        self.label_interval = ttk.Label(self, text="Отрезок")
+        self.label_interval.pack()
 
         frame_ab = ttk.Frame(self)
         frame_ab.pack()
@@ -37,35 +34,37 @@ class DySecondPage(tk.Frame):
         self.label_b.pack(side="left")
         self.entry_b.pack(side="left", padx=5)
 
-        self.label_function = ttk.Label(self, text="Начальные условия")
-        self.label_function.pack()
+        self.label_initial_conditions = ttk.Label(self, text="Начальные условия")
+        self.label_initial_conditions.pack()
 
         frame_cd = ttk.Frame(self)
         frame_cd.pack()
 
-        self.label_c = ttk.Label(frame_cd, text="")
+        self.label_c = ttk.Label(frame_cd, text="x0 =")
         self.entry_c = ttk.Entry(frame_cd, width=3)
         self.label_c.pack(side="left")
         self.entry_c.pack(side="left", padx=5)
 
-        self.label_d = ttk.Label(frame_cd, text="")
+        self.label_d = ttk.Label(frame_cd, text="y0 =")
         self.entry_d = ttk.Entry(frame_cd, width=3)
         self.label_d.pack(side="left")
         self.entry_d.pack(side="left", padx=5)
 
-        # Bind the function to the entry widget
-        self.entry_a.bind('<FocusOut>', self.update_labels)
+        self.label_d_prime = ttk.Label(frame_cd, text="y'0 =")
+        self.entry_d_prime = ttk.Entry(frame_cd, width=3)
+        self.label_d_prime.pack(side="left")
+        self.entry_d_prime.pack(side="left", padx=5)
 
-        ttk.Label(self, text="Шаг:").pack()
-        self.entry_h = ttk.Entry(self, width=6)
-        self.entry_h.pack()
+        ttk.Label(self, text="Кол-во разбиений:").pack()
+        self.entry_partitions = ttk.Entry(self, width=6)
+        self.entry_partitions.pack()
 
         ttk.Label(self, text="Метод:").pack()
 
         self.method_var = tk.StringVar()
-        self.method_var.set("Эйлера")  # Метод по умолчанию
+        self.method_var.set("Рунге–Кутта")
 
-        methods = ["Эйлера"]
+        methods = ["Рунге–Кутта"]
 
         for method in methods:
             ttk.Radiobutton(self, text=method, variable=self.method_var, value=method).pack()
@@ -86,24 +85,21 @@ class DySecondPage(tk.Frame):
         self.button_main_page = ttk.Button(self, text="️Главное меню", command=self.show_main_page)
         self.button_main_page.pack()
 
-    def update_labels(self, event):
-        # Get the value from entry_a and update labels
-        a_value = self.entry_a.get()
-        self.label_c.config(text=f"y'({a_value}) =")
-        self.label_d.config(text=f"y''({a_value}) =")
-
     def calculate(self):
         try:
-            function_str = self.entry_function.get()
+            equation_str = self.entry_equation.get()
             a = float(self.entry_a.get())
             b = float(self.entry_b.get())
             c = float(self.entry_c.get())
             d = float(self.entry_d.get())
-            h = int(self.entry_h.get())
+            d_prime = float(self.entry_d_prime.get())
+            partitions = int(self.entry_partitions.get())
 
-            result = self.calculate_double_euler(function_str, a, b, c, d, h)
+            method = self.method_var.get()
 
             start_time = time.time()
+
+            result = self.calculate_runge_kutta_second(equation_str, a, b, c, d, d_prime, partitions)
 
             end_time = time.time()
             elapsed_time = end_time - start_time
@@ -112,74 +108,54 @@ class DySecondPage(tk.Frame):
 
             pair_number = 1
             for x, y in result:
-                formatted_result = f"{pair_number} пара ---- x={x:.3f}, y={y:.3f}\n"
+                formatted_result = f"{pair_number} пара ---- x={x:.5f}, y={y:.5f}\n"
                 self.result_text.insert(tk.END, formatted_result)
                 pair_number += 1
 
-            # Добавим время выполнения
-            self.result_text.insert(tk.END, f"Время выполнения: {elapsed_time:.4f} секунд")
+            self.result_text.insert(tk.END, f"Время выполнения: {elapsed_time:.5f} секунд")
 
-            # Use the after() method to schedule the update_plot() function on the main thread
-            self.after(10, lambda: self.update_plot(result, h))
+            self.after(10, lambda: self.update_plot(result, method, partitions))
 
         except ValueError as e:
             self.result_text.delete(1.0, tk.END)
             error_message = f"Ошибка ввода данных: {str(e)}"
             self.result_text.insert(tk.END, error_message)
 
+    def update_plot(self, result, method, partitions):
+        plt.clf()
 
-    def perform_calculations(self, function_str, a, b, c, d, h, method):
-        start_time = time.time()
-
-        result = self.calculate_euler(function_str, a, b, c, d, h)
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-
-        # Use the main thread to update the text field
-        self.result_text.delete(1.0, tk.END)
-        for x, y in result:
-            formatted_result = f"x={x:.3f}, y={y:.3f}\n"
-            self.result_text.insert(tk.END, formatted_result)
-        self.result_text.insert(tk.END, f"Время выполнения: {elapsed_time:.4f} секунд")
-
-        # Use the main thread to update the plot
-        self.update_plot(result, method, h)
-
-    def update_plot(self, result, method, h):
-        plt.clf()  # Clear the current plot
-
-        # Prepare data for plotting
         x_values, y_values = zip(*result)
 
-        # Plot the graph
-        plt.plot(x_values, y_values, label=f"Эйлера ({h} разбиений)")
-
-        # Add labels and legend
+        plt.plot(x_values, y_values, label=f"Рунге–Кутта ({partitions} разбиений)", marker='o')
         plt.title("Интегральные кривые")
         plt.xlabel("x")
         plt.ylabel("y")
         plt.legend()
 
-        # Show the plot
-        plt.pause(0.01)  # Pause to allow the plot to update
+        plt.pause(0.01)
 
-    def calculate_euler(function_str, a, b, c, d, h):
+
+    def calculate_runge_kutta_second(self, equation_str, a, b, c, d, d_prime, partitions):
         result = []
+        h = (b - a) / partitions
 
-        x, y = Symbol('x'), Symbol('y')
-        expression = sympify(function_str)
+        x, y, z = Symbol('x'), Symbol('y'), Symbol('z')
+        equation = sympify(equation_str)
 
         while c <= (b - h):
-            dy1 = h * expression.subs({x: c, y: d})
-            dy2 = h * expression.subs({x: c + h, y: d + dy1})
-
-            d = d + (dy1 + dy2) / 2
+            k1_y = d_prime
+            k1_z = equation.subs({x: c, y: d, z: d_prime})
+            k2_y = d_prime + h * k1_z / 2
+            k2_z = equation.subs({x: c + h / 2, y: d + h * k1_y / 2, z: d_prime + h * k1_z / 2})
+            k3_y = d_prime + h * k2_z / 2
+            k3_z = equation.subs({x: c + h / 2, y: d + h * k2_y / 2, z: d_prime + h * k2_z / 2})
+            k4_y = d_prime + h * k3_z
+            k4_z = equation.subs({x: c + h, y: d + h * k3_y, z: d_prime + h * k3_z})
+            d_prime = d_prime + h / 6 * (k1_z + 2 * k2_z + 2 * k3_z + k4_z)
+            d = d + h / 6 * (k1_y + 2 * k2_y + 2 * k3_y + k4_y)
             result.append((c + h, d))
             c = c + h
-
         return result
-
 
     def show_dy_page(self):
         plt.close()
