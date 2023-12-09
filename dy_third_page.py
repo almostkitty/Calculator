@@ -96,7 +96,7 @@ class DyThirdPage(tk.Frame):
                 x, y, z = x1, y1, z1
                 t_start += h
 
-            elapsed_time = time.time() - start_time  # Calculate the elapsed time
+            elapsed_time = time.time() - start_time
             result_text += f"Время выполнения: {elapsed_time:.4f} секунд"
 
             self.result_text.delete(1.0, tk.END)
