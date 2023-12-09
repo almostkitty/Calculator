@@ -1,10 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import PhotoImage
-from sympy import sympify, Symbol
-import numpy as np
 import time
 import matplotlib.pyplot as plt
+
 
 class DySecondPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -149,7 +148,6 @@ class DySecondPage(tk.Frame):
         plt.legend()
 
         plt.pause(0.01)
-
 
     def show_dy_page(self):
         plt.close()
