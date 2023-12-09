@@ -3,9 +3,6 @@ from tkinter import ttk
 from tkinter import PhotoImage
 import math
 import time
-# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-# import matplotlib.pyplot as plt
-
 
 
 class DyThirdPage(tk.Frame):
@@ -89,9 +86,6 @@ class DyThirdPage(tk.Frame):
             t_end = float(self.entry_td.get())
             h = float(self.entry_h.get())
 
-            # x_values = []
-            # y_values = []
-
             result_text = ""
 
             while t_start < t_end:
@@ -102,17 +96,12 @@ class DyThirdPage(tk.Frame):
                 x, y, z = x1, y1, z1
                 t_start += h
 
-                # x_values.append(x)
-                # y_values.append(y)
-
             elapsed_time = time.time() - start_time  # Calculate the elapsed time
             result_text += f"Время выполнения: {elapsed_time:.4f} секунд"
 
-            # Clear existing content and insert the result into the text widget
             self.result_text.delete(1.0, tk.END)
             self.result_text.insert(tk.END, result_text)
 
-            #self.update_plot(x_values, y_values, h)
 
 
         except ValueError as e:
@@ -120,20 +109,6 @@ class DyThirdPage(tk.Frame):
             self.result_text.delete(1.0, tk.END)
             self.result_text.insert(tk.END, error_message)
 
-    # def update_plot(self, x_values, y_values, h):
-    #     plot_window = tk.Toplevel(self)
-    #     plot_window.title("График")
-    #
-    #     fig, ax = plt.subplots()
-    #     ax.plot(x_values, y_values, label=f"Эйлера, шаг ({h} )")
-    #     ax.set_title("Интегральные кривые")
-    #     ax.set_xlabel("x")
-    #     ax.set_ylabel("y")
-    #     ax.legend()
-    #
-    #     canvas = FigureCanvasTkAgg(fig, master=plot_window)
-    #     canvas.draw()
-    #     canvas.get_tk_widget().pack()
 
     def show_dy_page(self):
         self.controller.show_page("DySelectPage")
