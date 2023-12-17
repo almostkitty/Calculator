@@ -13,26 +13,20 @@ class MainPage(tk.Frame):
         label2 = ttk.Label(self, text="↪️Выберите операцию↩️")
         label2.pack(pady=20, padx=20)
 
-        button1 = ttk.Button(self, text="Интегрирование✅", command=lambda: controller.show_page("IntegrationPage"))
-        button1.pack(fill="x")
+        button_data = [
+            ("Интегрирование✅", "IntegrationPage"),
+            ("Кратный интеграл✅", "KratniPage"),
+            ("Дифференциальные Уравнения✅", "DySelectPage"),
+            ("Элементарные функции✅", "ElPage"),
+            ("Нелинейные Уравнения✅", "NlPage"),
+            ("Разработчики🧑🏿‍💻", "DevPage"),
+            ("Настройки⚙️", "SetPage"),
+            ("Выйти️❌", lambda: self.close_app())
+        ]
 
-        button2 = ttk.Button(self, text="Кратный интеграл✅", command=lambda: controller.show_page("KratniPage"))
-        button2.pack(fill="x")
-
-        button3 = ttk.Button(self, text="Дифференциальные Уравнения✅", command=lambda: controller.show_page("DySelectPage"))
-        button3.pack(fill="x")
-
-        button4 = ttk.Button(self, text="Нелинейные Уравнения✅", command=lambda: controller.show_page("NlPage"))
-        button4.pack(fill="x")
-
-        button5 = ttk.Button(self, text="Разработчики🧑🏿‍💻", command=lambda: controller.show_page("DevPage"))
-        button5.pack(fill="x")
-
-        button6 = ttk.Button(self, text="Настройки⚙️", command=lambda: controller.show_page("SetPage"))
-        button6.pack(fill="x")
-
-        button7 = ttk.Button(self, text="Выйти️❌", command=self.close_app)
-        button7.pack(fill="x")
+        for text, command in button_data:
+            button = ttk.Button(self, text=text, command=lambda c=command: controller.show_page(c))
+            button.pack(fill="x")
 
     def close_app(self):
         self.controller.quit()
