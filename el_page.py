@@ -96,7 +96,7 @@ class ElPage(tk.Frame):
         else:
             return 2 * x * self.cheb(x, n - 1) - self.cheb(x, n - 2)
 
-    def chebyshev_exp(self, x, n, a):
+    def cheb_exp(self, x, n, a):
         t = self.cheb(x, n)
         return np.sum(a * t)
 
@@ -113,7 +113,7 @@ class ElPage(tk.Frame):
         b = 2 * 10 ** (-7)
 
         if abs(x) <= 1:
-            result = np.exp(x) * (1 + b * self.chebyshev_exp(x, 7, a))
+            result = np.exp(x) * (1 + b * self.cheb_exp(x, 8, a))
             return str(result)
         else:
             return "Некорректный ввод"
@@ -129,10 +129,10 @@ class ElPage(tk.Frame):
             return "Error: Некорректный ввод"
 
         if abs(x) <= np.pi / 2:
-            a = np.array([0.9999998, 1.0000000, 0.5000063, 0.1666674, 0.0416350, 0.0083298, 0.0014393, 0.0002040])
+            a = np.array([1.000000002, -1.66666589, 0.008333075, -0.000198107, 0.000002608])
             b = 2 * 10 ** (-7)
 
-            result = np.sin(x) * (1 + b * self.cheb_sin(x, a, 7))
+            result = np.sin(x) * (1 + b * self.cheb_sin(x, a, 5))
             return str(result)
         else:
             return "Error: Введите число не больше pi/2"
