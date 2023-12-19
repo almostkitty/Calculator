@@ -1,8 +1,6 @@
-import math
 import numpy as np
 import tkinter as tk
 from tkinter import ttk
-from math import pi
 
 
 class ElPage(tk.Frame):
@@ -90,6 +88,18 @@ class ElPage(tk.Frame):
         data["result_text"].delete(1.0, tk.END)  # Очищаем текущий текст
         data["result_text"].insert(tk.END, result)  # Вставляем новый текст
 
+    def cheb(self, x, n):
+        if n == 0:
+            return np.ones_like(x)
+        elif n == 1:
+            return x
+        else:
+            return 2 * x * self.cheb(x, n - 1) - self.cheb(x, n - 2)
+
+    def chebyshev_exp(self, x, n, a):
+        t = self.cheb(x, n)
+        return np.sum(a * t)
+
     def calculate_e(self, entry_a):
         try:
             x = float(entry_a)
@@ -99,31 +109,18 @@ class ElPage(tk.Frame):
         if abs(x) > 1:
             return "Error: Введите число не больше 1"
 
-        a = [0.9999998, 1.0000000, 0.5000063, 0.1666674, 0.0416350, 0.0083298, 0.0014393, 0.0002040]
-        eps = 2e-7
+        a = np.array([0.9999998, 1.0000000, 0.5000063, 0.1666674, 0.0416350, 0.0083298, 0.0014393, 0.0002040])
+        b = 2 * 10 ** (-7)
 
-        i = 1
-        result = 0
-
-        for idx, v in enumerate(a):
-            result += i * v
-            if abs(i * v) < eps:
-                break
-            i *= x
-
-        return result
-
-    def cheb(self, x, n):
-        if n == 0:
-            return np.ones_like(x)
-        elif n == 1:
-            return x
+        if abs(x) <= 1:
+            result = np.exp(x) * (1 + b * self.chebyshev_exp(x, 7, a))
+            return str(result)
         else:
-            return 2 * x * self.cheb(x, n - 1) - self.cheb(x, n - 2)
+            return "Некорректный ввод"
 
     def cheb_sin(self, x, a, n):
         t = self.cheb(x, n)
-        return np.dot(a, t)
+        return np.sum(a * t)
 
     def calculate_sin(self, entry_a):
         try:
@@ -139,7 +136,6 @@ class ElPage(tk.Frame):
             return str(result)
         else:
             return "Error: Введите число не больше pi/2"
-
 
     def calculate_sqrt(self, entry_a, entry_b):
         try:
