@@ -130,7 +130,7 @@ class ElPage(tk.Frame):
 
         if abs(x) <= np.pi / 2:
             a = np.array([1.000000002, -1.66666589, 0.008333075, -0.000198107, 0.000002608])
-            b = 2 * 10 ** (-7)
+            b = 6 * 10 ** (-9)
 
             result = np.sin(x) * (1 + b * self.cheb_sin(x, a, 5))
             return str(result)
