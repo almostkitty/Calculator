@@ -1,3 +1,5 @@
+import math
+import numpy as np
 import tkinter as tk
 from tkinter import ttk
 from math import pi
@@ -37,15 +39,21 @@ class ElPage(tk.Frame):
 
             to_text = data.get("to_text", "")
 
-            label_b = ttk.Label(entry_frame, text=to_text)
-            entry_b = ttk.Entry(entry_frame, width=3)
-            label_b.pack(side="left")
-            entry_b.pack(side="left", padx=5)
+            if to_text:
+                label_b = ttk.Label(entry_frame, text=to_text)
+                entry_b = ttk.Entry(entry_frame, width=3)
+                label_b.pack(side="left")
+                entry_b.pack(side="left", padx=5)
+                data["entry_b"] = entry_b
 
-            data["entry_b"] = entry_b
+            calculate_button = ttk.Button(
+                frame,
+                text="Вычислить",
+                command=lambda data=data,
+                               entry_a=entry_a,
+                               entry_b=data.get("entry_b"): self.calculate(data, entry_a, entry_b)
+            )
 
-            calculate_button = ttk.Button(frame, text="Вычислить", command=lambda data=data, entry_a=entry_a, entry_b=entry_b: self.calculate(data, entry_a, entry_b)
-)
             calculate_button.pack(side="left", padx=5)
 
             result_text = tk.Text(frame, height=1, width=20)
@@ -61,7 +69,7 @@ class ElPage(tk.Frame):
     def calculate(self, data, entry_a, entry_b):
         try:
             value_a = float(entry_a.get())
-            value_b = float(entry_b.get())
+            value_b = float(data.get("entry_b").get()) if data.get("entry_b") else None
 
             if data["label_text"] == "eˆx":
                 result = self.calculate_e(value_a)
@@ -94,25 +102,28 @@ class ElPage(tk.Frame):
         a = [0.9999998, 1.0000000, 0.5000063, 0.1666674, 0.0416350, 0.0083298, 0.0014393, 0.0002040]
         eps = 2e-7
 
-        x_scaled = x / 2  # Масштабируем x для использования метода Чебышева на интервале [-1, 1]
-        u = 2 * x_scaled  # Переменная u для метода Чебышева
+        i = 1
+        result = 0
 
-        i = len(a) - 1
-        result = a[i]
-
-        while i > 0:
-            i -= 1
-            temp = result
-            result_old = result
-            result = a[i] + u * result - temp
-
-            # Проверяем точность
-            if abs(result - result_old) < eps:
+        for idx, v in enumerate(a):
+            result += i * v
+            if abs(i * v) < eps:
                 break
-
-        result *= 2 * x_scaled  # Масштабируем результат обратно
+            i *= x
 
         return result
+
+    def cheb(self, x, n):
+        if n == 0:
+            return np.ones_like(x)
+        elif n == 1:
+            return x
+        else:
+            return 2 * x * self.cheb(x, n - 1) - self.cheb(x, n - 2)
+
+    def cheb_sin(self, x, a, n):
+        t = self.cheb(x, n)
+        return np.dot(a, t)
 
     def calculate_sin(self, entry_a):
         try:
@@ -120,32 +131,14 @@ class ElPage(tk.Frame):
         except ValueError:
             return "Error: Некорректный ввод"
 
-        if x > pi / 2:
+        if abs(x) <= np.pi / 2:
+            a = np.array([0.9999998, 1.0000000, 0.5000063, 0.1666674, 0.0416350, 0.0083298, 0.0014393, 0.0002040])
+            b = 2 * 10 ** (-7)
+
+            result = np.sin(x) * (1 + b * self.cheb_sin(x, a, 7))
+            return str(result)
+        else:
             return "Error: Введите число не больше pi/2"
-
-        a = [1.000000002, -1.66666589, 0.008333075, -0.000198107, 0.000002608]
-        eps = 6e-9
-
-        x_scaled = x / (pi / 2)  # Масштабируем x для использования метода Чебышева на интервале [-1, 1]
-        u = 2 * x_scaled - 1  # Переменная u для метода Чебышева
-
-        i = len(a) - 1
-        result = a[i]
-        term = result
-        u_power = u
-
-        while i > 0:
-            i -= 1
-            term = a[i] + u * term
-            result += term
-            u_power *= u
-
-            if abs(term * u_power) < eps:  # Проверяем завершения
-                break
-
-        result *= x_scaled  # Масштабируем результат
-
-        return result
 
 
     def calculate_sqrt(self, entry_a, entry_b):
@@ -163,7 +156,7 @@ class ElPage(tk.Frame):
             y = y_res
             y_res = 0.5 * (y + x / y)
 
-        return y_res
+        return str(y_res)
 
     def calculate_div_sqrt(self, entry_a, entry_b):
         try:
@@ -178,15 +171,19 @@ class ElPage(tk.Frame):
 
         while eps < abs(y_res - y):
             y = y_res
+            if y == 0:
+                return "Error: Деление на ноль"
             y_res = y / 2 * (3 - x * y * y)
 
-        return y_res
+        return str(y_res)
 
     def clear(self):
         for data in self.frame_data:
             data["result_text"].delete(1.0, tk.END)  # Очищаем текстовые поля
-            data["entry_a"].delete(0, tk.END)  # Очищаем поле ввода "x"
-            data["entry_b"].delete(0, tk.END)  # Очищаем поле ввода "y"
+            data["entry_a"].delete(0, tk.END)  # Очищаем "x"
+
+            if "entry_b" in data:
+                data["entry_b"].delete(0, tk.END)  # Очищаем "y"
 
     def show_main_page(self):
         self.controller.show_page("MainPage")
